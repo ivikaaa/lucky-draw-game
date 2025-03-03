@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Draw Game</title>
+    <style>
+        body {
+            background-color: pink;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+        }
+        h1 {
+            color: white;
+            margin-top: 20px;
+        }
+        .stars {
+            font-size: 40px;
+            color: gray; /* Empty Stars at Start */
+        }
+        .filled {
+            color: gold;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+        }
+        .card {
+            width: 200px;
+            height: 280px;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.5s;
+            margin-bottom: 20px;
+        }
+        .flipped {
+            transform: rotateY(360deg);
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .higher {
+            background-color: green;
+            color: white;
+        }
+        .lower {
+            background-color: red;
+            color: white;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: gold;
+            opacity: 0.8;
+            position: absolute;
+            animation: fall 2s linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Lucky Draw - Higher or Lower?</h1>
+    
+    <div class="stars">
+        <span id="star1">☆</span>
+        <span id="star2">☆</span>
+        <span id="star3">☆</span>
+    </div>
+
+    <div class="game-container">
+        <div class="card" id="card">?</div>
+
+        <div class="buttons">
+            <button class="higher" onclick="guess('higher')">Higher</button>
+            <button class="lower" onclick="guess('lower')">Lower</button>
+        </div>
+    </div>
+
+    <script>
+        let points = 0;
+        let currentCard = getRandomCard();
+        document.getElementById("card").textContent = currentCard;
+
+        function getRandomCard() {
+            return Math.floor(Math.random() * 13) + 1; // 1-13 (Ace-King)
+        }
+
+        function guess(choice) {
+            let newCard = getRandomCard();
+            let cardElement = document.getElementById("card");
+
+            // Flip animation
+            cardElement.classList.add("flipped");
+            setTimeout(() => {
+                cardElement.textContent = newCard;
+                cardElement.classList.remove("flipped");
+
+                if ((choice === "higher" && newCard > currentCard) || (choice === "lower" && newCard < currentCard)) {
+                    points++;
+                    updateStars();
+                    
+                    if (points === 3) {
+                        winGame();
+                    }
+                } else {
+                    alert("Wrong guess! You lost all points. 😢 Try again.");
+                    resetGame();
+                }
+
+                currentCard = newCard; // Update current card
+            }, 500);
+        }
+
+        function updateStars() {
+            document.getElementById("star1").textContent = points >= 1 ? "⭐" : "☆";
+            document.getElementById("star2").textContent = points >= 2 ? "⭐" : "☆";
+            document.getElementById("star3").textContent = points >= 3 ? "⭐" : "☆";
+        }
+
+        function winGame() {
+            alert("🎉 Congratulations! You won the plushie! 🎉");
+            createConfetti();
+            setTimeout(resetGame, 3000);
+        }
+
+        function resetGame() {
+            points = 0;
+            currentCard = getRandomCard();
+            document.getElementById("card").textContent = currentCard;
+            updateStars();
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 100; i++) {
+                let confetti = document.createElement("div");
+                confetti.classList.add("confetti");
+                document.body.appendChild(confetti);
+
+                confetti.style.left = Math.random() * window.innerWidth + "px";
+                confetti.style.animationDuration = (Math.random() * 2 + 1) + "s";
+
+                setTimeout(() => confetti.remove(), 2000);
+            }
+        }
+    </script>
+</body>
+</html>
